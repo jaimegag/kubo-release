@@ -62,7 +62,7 @@ main() {
   echo "System specs added successfully."
 
   <% if !p('addons-spec').empty? and p('addons-spec') != "nil" %>
-  apply_spec "addon-spec.yml"
+  apply_spec "addon-spec/addon-spec.yml"
   <% else %>
   echo "No addons to apply."
   <% end %>

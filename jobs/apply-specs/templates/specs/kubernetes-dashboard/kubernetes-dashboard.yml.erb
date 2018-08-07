@@ -100,8 +100,8 @@ spec:
           - --heapster-host=https://heapster.kube-system.svc.cluster.local:8443
         <%- end -%>
           - --default-cert-dir=/certs
-          - --tls-cert-file=kubernetes-dashboard-cert
-          - --tls-key-file=kubernetes-dashboard-key
+          - --tls-cert-file=kubernetes-dashboard.crt
+          - --tls-key-file=kubernetes-dashboard.key
           # Uncomment the following line to manually specify Kubernetes API server Host
           # If not specified, Dashboard will attempt to auto discover the API server and connect
           # to it. Uncomment only if the default does not work.
@@ -113,9 +113,11 @@ spec:
         - mountPath: /certs
           name: kubernetes-dashboard-certs
           readOnly: true
+        <%- if !p('delete-heapster') then -%>
         - mountPath: /etc/ssl/certs/
           name: heapster-ca
           readOnly: true
+        <%- end -%>
         livenessProbe:
           httpGet:
             scheme: HTTPS
@@ -129,12 +131,14 @@ spec:
           secretName: kubernetes-dashboard-certs
       - name: tmp-volume
         emptyDir: {}
+      <%- if !p('delete-heapster') then -%>
       - name: heapster-ca
         configMap:
           name: kubernetes-dashboard
           items:
           - key: ca.pem
             path: ca-certificates.crt
+      <%- end -%>
       serviceAccountName: kubernetes-dashboard
       # Comment the following tolerations if Dashboard must not be deployed on master
       # tolerations:
